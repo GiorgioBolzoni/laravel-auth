@@ -1,6 +1,6 @@
 <?php
 return [
-    'posts' => [ #oggi non sarà post ma portfolio
+    'projects' => [
         [
             "image" => "https://immagini.editorialedomani.it/version/c:ZDEzODQyM2QtNDhiZS00:ZWRhZTlj/pag_8_fat_peolple_don-t_go_to_heaven-def-jpg.webp?f=3%3A2&q=0.75&w=635",
             "title" => "Il paradiso è dei magri",
