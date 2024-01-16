@@ -34,7 +34,7 @@ return [
         [
             "image" => "https://immagini.editorialedomani.it/version/c:ZjcwZjYxMGYtNjdiMi00:MGExMjE4/11590257.webp?f=3%3A2&q=0.75&w=635",
             "title" => "Lo scrittore ucciso verso sera dalle bugie delle sue lettrici",
-            "body" => "Un grande scrittore a fine vita viene preso da uno scrupolo assurdo: e se nessuno lo avesse mai letto?<br>Nella sua stanza d'ospedale – dove transitano infermieri, editori, amanti e uffici stampa – attua una messinscena per smascherare gli impostori dai suoi lettori veri<br>L'ossessione del grande scrittore malato è una storia che nasconde una preoccupazione reale: la perdita di centralità della letteratura, in un mondo social in cui conta non tanto leggere quanto dichiarare di aver letto"
+            "body" => "Un grande scrittore a fine vita viene preso da uno scrupolo assurdo: e se nessuno lo avesse mai letto?<br>Nella sua stanza d'ospedale dove transitano infermieri, editori, amanti e uffici stampa attua una messinscena per smascherare gli impostori dai suoi lettori veri<br>L'ossessione del grande scrittore malato è una storia che nasconde una preoccupazione reale: la perdita di centralità della letteratura, in un mondo social in cui conta non tanto leggere quanto dichiarare di aver letto"
         ],
         [
             "image" => "https://immagini.editorialedomani.it/version/c:ZGQ2MDg4OWMtZWQxOS00:Y2RiMWNi/britain-the-little-mermaid-arrivals.webp?f=3%3A2&q=0.75&w=635",

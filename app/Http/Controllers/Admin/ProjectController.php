@@ -2,23 +2,36 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-
 use App\Models\Project;
+use Illuminate\Http\Request;
+
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
-
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+
 
 class ProjectController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::all();
+
+
+        if (!empty($request->query('search'))) {
+            $search = $request->query('search');
+            $projects = Project::where('title', 'like', $search . '%')->get();
+
+        } else {
+            $projects = Project::all();
+
+        }
+
+
         return view('admin.projects.index', compact('projects'));
     }
 
@@ -28,6 +41,7 @@ class ProjectController extends Controller
     public function create()
     {
         return view('admin.projects.create');
+
     }
 
     /**
@@ -35,20 +49,27 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
+        $form_data = $request->validated();
+        // dd($form_data);
 
-        $formData = $request->validated();
-        //CREATE SLUG
-        $slug = Str::slug($formData['title'], '-');
-        //add slug to formData
-        $formData['slug'] = $slug;
-        //prendiamo l'id dell'utente loggato
-        $userId = Auth::id();
-        //dd($userId);
-        //aggiungiamo l'id dell'utente
-        $formData['user_id'] = $userId;
+        $slug = Project::getSlug($form_data['title']);
 
-        $project = Project::create($formData);
-        return redirect()->route('admin.projects.show', $project->id);
+
+        $form_data['slug'] = $slug;
+
+        $userId = auth()->id();
+        $form_data['user_id'] = $userId;
+
+        if ($request->hasFile('image')) {
+            $name = Str::slug($form_data['title'], '-') . '.jpg';
+            $img_path = Storage::putFileAs('images', $form_data['image'], $name);
+            $form_data['image'] = $img_path;
+        }
+
+
+        $newProject = Project::create($form_data);
+
+        return to_route('admin.projects.index');
     }
 
     /**
@@ -57,6 +78,7 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
         return view('admin.projects.show', compact('project'));
+
     }
 
     /**
@@ -65,6 +87,7 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         return view('admin.projects.edit', compact('project'));
+
     }
 
     /**
@@ -72,17 +95,30 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        $formData = $request->validated();
-        //CREATE SLUG
-        $slug = Str::slug($formData['title'], '-');
-        //add slug to formData
-        $formData['slug'] = $slug;
+        $form_data = $request->validated();
 
-        //aggiungiamo l'id dell'utente proprietario del project
-        $formData['user_id'] = $project->user_id;
+        if ($project->title !== $form_data['title']) {
+            $slug = Project::getSlug($form_data['title']);
+            $form_data['slug'] = $slug;
 
-        $project->update($formData);
-        return redirect()->route('admin.projects.show', $project->id);
+        }
+
+
+        $form_data['user_id'] = $project->user_id;
+
+        if ($request->hasFile('image')) {
+            if ($project->image) {
+                Storage::delete($project->image);
+            }
+            $name = Str::slug($form_data['title'], '-') . '.jpg';
+            $img_path = Storage::putFileAs('images', $form_data['image'], $name);
+
+            $form_data['image'] = $img_path;
+        }
+
+        $project->update($form_data);
+
+        return redirect()->route('admin.projects.show', $project->slug);
     }
 
     /**
@@ -91,6 +127,9 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         $project->delete();
-        return to_route('admin.projects.index')->with('message', "$project->title eliminato con successo");
+        if ($project->image) {
+            Storage::delete($project->image);
+        }
+        return redirect()->route('admin.projects.index')->with('message', "The project '$project->title' has been deleted");
     }
 }

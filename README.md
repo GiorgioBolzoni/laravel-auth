@@ -27,7 +27,9 @@ php artisan serve
 ctrl + c
 
 ```
+
 ## Configurazione Laravel
+
 ```bash
 npm remove postcss
 
@@ -111,12 +113,13 @@ git init
 git add .
 git commit -m "first commit"
 git branch -M main
-git remote add origin your_git_url 
+git remote add origin your_git_url
 git push -u origin main
 
 
 ```
-## Clono progetto da github 
+
+## Clono progetto da github
 
 ```bash
 # copio file .env.example e lo rinomino in .env
@@ -131,10 +134,16 @@ npm install
 
 # inserisco i dati per il collegamento al db in env
 
-#creo migration
+#creo migration es.
 php artisan make:migration create_nome_tabella_table
+
+#creo migration per modifiche
 php artisan make:migration update_users_table --table=users
 php artisan make:migration add_phone_number_to_users_table
+
+    #dentro up della migration
+            $table->string('series', 100)->chenge();
+
 
 #lanciare migration
 php artisan migrate
@@ -142,36 +151,53 @@ php artisan migrate
 #revert migration
 php artisan migrate:rollback
 
+#creare il model (necessario per salvare dati su db con seeder)
+php artisan make:model Nome
 
-#popolare il db
+#popolare il db  es.
 php artisan make:seeder UsersTableSeeder
 
-php artisan db:seed --class=UsersTableSeeder
+php artisan db:seed --class=UserSeeder
 
-# preparo le rotte file web.php es. 
+# preparo le rotte file web.php es.
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
-# oppure resource route per tutte le operazioni CRUD
-Route::resource('books', BookController::class);
 
 # creo controller
-php artisan make:controller NomeController
-#con opzione resource controller
-php artisan make:controller NomeController --resource
+php artisan make:controller BookController
+#creare controller con resources
+php artisan make:controller ComicController --resources
 
-
-#creo model
-php artisan make:model Nome 
-#posso creare il model e contestualmente resource controller, migration, seeder e form request per validazioni
-php artisan make:model Nome -rcms --requests
 
 # creo le views relative
+```
 
-#creo form request per validazione
-	
-php artisan make:request StoreMomemodelRequest
+## Resource Controller
+
+```bash
+#ceare model con relativo resource controller, migration e seeder
+php artisan make:model Comic -rcms
+#con anche request
+php artisan make:model Comic -rcms --request
+
+#leggere rotte:
+php artisan route:list --except-vendor
+
+#aggiungere rotta relativa in web.php
+Route::resource('comics', ComicController::class);
+```
+
+<!-- composer dump-autoload -->
+
+## Validazioni
+
+```bash
+#creo la form request per validazione
+php artisan make:request StoreNomeModelRequest
+php artisan make:request UpdateNomeModelRequest
 
 
 ```
+
 ## Auth
 
 ```bash
@@ -201,4 +227,36 @@ Route::fallback(function() {
     return redirect()->route('admin.dashboard');
 });
 
+```
+
+## Fileupload - File Storage
+
+```bash
+#in env file modifica chiave
+
+FILESYSTEM_DRIVER=public
+
+#Caricheremo i nostri file nella cartella storage/app/public,
+# modifichiamo quindi in config/filestystems.php
+
+'default' => env('FILESYSTEM_DRIVER', 'public'),
+
+#lanciare comando
+
+php artisan storage:link
+
+#nelle funzioni create e edit (dove è presente il form con l'inserimento immagine)
+
+$file_path = Storage::put('uploads', $request->image);
+#oppure
+$file_path= Storage::put('nomecartella', $data['image']);
+
+
+#dopodichè aggiungere il path ai dati
+
+$data['image'] = $file_path;
+
+
+#per visualizzare nelle views
+<img src="{{ asset('storage/' . $project->image) }}">
 ```
